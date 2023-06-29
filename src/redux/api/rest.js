@@ -8,7 +8,18 @@ export const restApi = createApi({
     endpoints: (builder) => ({
         upload: builder.mutation({
             query: (body) => ({
-                url: '/code/upload',
+                url: 'code/upload',
+                method: 'POST',
+                body,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+        }),
+
+        register: builder.mutation({
+            query: (body) => ({
+                url: 'user/register',
                 method: 'POST',
                 body,
                 headers: {
@@ -19,4 +30,4 @@ export const restApi = createApi({
     })
 })
 
-export const {useUploadMutation} = restApi
+export const {useUploadMutation, useRegisterMutation} = restApi

@@ -1,7 +1,12 @@
-import {Box, Button, MenuItem, Paper, TextField, Typography} from "@mui/material";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useState} from "react";
+
 import datesBetween from "dates-between";
+import {Box, Button, MenuItem, Paper, TextField, Typography} from "@mui/material";
+import {useNavigate} from "react-router-dom";
+import {useDispatch} from "react-redux";
+
 import {useUploadMutation} from "../redux/api/rest.js";
+import {registration} from "../redux/slices/entrySlice.js";
 
 const styles = {
     form: {
@@ -39,25 +44,38 @@ export default function Code() {
 
     const [upload] = useUploadMutation()
 
-    const handleChange = useCallback((event) => {
-        switch (event.target.name) {
-            case 'email':
-                setEmail(event.target.value)
-                break
-            case 'code':
-                setCode(event.target.value)
-                break
-            case 'day':
-                setDay(event.target.value)
-                break
-            case 'hour':
-                setHour(event.target.value)
-                break
-            case 'minute':
-                setMinute(event.target.value)
-                break
-        }
-    }, [email, code, day, hour, minute])
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+
+    const formatText = (text) => {
+        return text.trim().toLowerCase()
+    }
+
+    const formatDate = (date) => {
+        return date.toString().padStart(2, '0')
+    }
+
+    const handleEmailChange = useCallback((e) => {
+        const res = formatText(e.target.value)
+        setEmail(res)
+    }, [email])
+
+    const handleCodeChange = useCallback((e) => {
+        const res = formatText(e.target.value)
+        setCode(res)
+    }, [code])
+
+    const handleDayChange = useCallback((e) => {
+        setDay(e.target.value)
+    }, [day])
+
+    const handleHourChange = useCallback((e) => {
+        setHour(e.target.value)
+    }, [hour])
+
+    const handleMinuteChange = useCallback((e) => {
+        setMinute(e.target.value)
+    }, [minute])
 
     const calculateDates = () => {
         let res = []
@@ -91,7 +109,7 @@ export default function Code() {
                     required
 
                     value={day || dates[dates.length - 1].value}
-                    onChange={handleChange}
+                    onChange={handleDayChange}
 
                     sx={{flexGrow: 2}}
                 >
@@ -112,30 +130,47 @@ export default function Code() {
         }
     }, [day])
 
-    const handleSubmit = useCallback(async (event) => {
+    const handleSubmit = useCallback((event) => {
         event.preventDefault()
-        console.log(`2023-${day} ${hour}:${minute}`)
 
-        upload({
-            email: email,
-            code: code,
-            purchase_time: `2023-${day} ${hour}:${minute}`
-        })
-            .unwrap()
-            .then((res) => {
-                const data = {
-                    success: res.success,
-                    won: res.won
-                }
-            })
-            .catch((err) => {
-                console.log(err.data.errors)
-            })
-    }, [email, code, day, hour, minute])
+        const resDate = {
+            day: formatDate(day),
+            hour: formatDate(hour),
+            minute: formatDate(minute)
+        }
 
-    useEffect(() => {
-        console.log(day)
-    }, [day])
+        if (code.length === 8) {
+            upload({
+                email: email,
+                code: code,
+                purchase_time: `2023-${resDate.day} ${resDate.hour}:${resDate.minute}`
+
+            })
+                .unwrap()
+                .then((res) => {
+                    const data = {
+                        success: res.data.success,
+                        won: res.data.won
+                    }
+                    console.log(data.won)
+
+                })
+                .catch((err) => {
+                    console.log(err)
+                    if (err.data.errors.length === 1 && err.data.errors[0].code === 'email:not_found') {
+                        dispatch(registration({
+                            email: email,
+                            code: code,
+                            purchase_time: `2023-${resDate.day} ${resDate.hour}:${resDate.minute}`
+                        }))
+                        navigate('/register')
+                    }
+                })
+        } else {
+            console.log('Invalid code')
+        }
+    }, [email, code, day, hour, minute, dispatch])
+
 
     return (
         <Paper
@@ -147,7 +182,7 @@ export default function Code() {
             onSubmit={handleSubmit}
         >
             <Typography
-                variant="h2"
+                variant='h2'
             >
                 Kódfeltöltés
             </Typography>
@@ -162,7 +197,7 @@ export default function Code() {
                 sx={{width: '75%'}}
 
                 value={email || ''}
-                onChange={handleChange}
+                onChange={handleEmailChange}
             />
 
             <TextField
@@ -175,7 +210,7 @@ export default function Code() {
                 sx={{width: '75%'}}
 
                 value={code || ''}
-                onChange={handleChange}
+                onChange={handleCodeChange}
             />
 
             <Box
@@ -192,7 +227,7 @@ export default function Code() {
                     required
 
                     value={hour}
-                    onChange={handleChange}
+                    onChange={handleHourChange}
 
                     sx={{flexGrow: 1}}
                 >
@@ -218,7 +253,7 @@ export default function Code() {
                     required
 
                     value={minute}
-                    onChange={handleChange}
+                    onChange={handleMinuteChange}
 
                     sx={{flexGrow: 1}}
                 >
