@@ -2,6 +2,7 @@ import {Route, Routes} from "react-router-dom";
 
 import Code from "./components/Code.jsx";
 import Register from "./components/Register.jsx";
+import Guard from "./components/Guard.jsx";
 
 function App() {
 
@@ -17,7 +18,9 @@ function App() {
             <Route
                 path="/register"
                 element={
-                    <Register/>
+                    <Guard>
+                        <Register/>
+                    </Guard>
                 }
             />
         </Routes>

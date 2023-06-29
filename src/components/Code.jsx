@@ -1,9 +1,10 @@
 import {useCallback, useState} from "react";
 
 import datesBetween from "dates-between";
-import {Box, Button, MenuItem, Paper, TextField, Typography} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
+
+import {Box, Button, MenuItem, Paper, TextField, Typography} from "@mui/material";
 
 import {useUploadMutation} from "../redux/api/rest.js";
 import {registration} from "../redux/slices/entrySlice.js";
@@ -15,8 +16,8 @@ const styles = {
         left: '50%',
         transform: 'translate(-50%, -50%)',
 
-        minWidth: '75vw',
-        minHeight: '50vh',
+        minWidth: '50vw',
+        minHeight: '35vh',
 
         display: 'flex',
         flexDirection: 'column',

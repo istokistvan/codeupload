@@ -16,7 +16,7 @@ const styles = {
         left: '50%',
         transform: 'translate(-50%, -50%)',
 
-        minWidth: '75vw',
+        minWidth: '50vw',
         minHeight: '35vh',
 
         display: 'flex',
@@ -36,7 +36,7 @@ export default function Register() {
     const [register] = useRegisterMutation()
     const [upload] = useUploadMutation()
 
-    const data = useSelector(state => state.entry)
+    const userData = useSelector(state => state.entry)
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -59,10 +59,10 @@ export default function Register() {
         const resName = formatText(name)
 
         if (rules && resName.length >= 2) {
-            register({email: data.email, name: resName})
+            register({email: userData.email, name: resName})
                 .unwrap()
                 .then((res) => {
-                    return upload({...data})
+                    return upload({...userData})
                         .unwrap()
                 })
                 .then((res) => {
@@ -96,7 +96,7 @@ export default function Register() {
                 type='email'
                 name='email'
                 disabled
-                value={data.email}
+                value={userData.email}
             />
 
             <TextField
