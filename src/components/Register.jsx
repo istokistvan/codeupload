@@ -28,7 +28,7 @@ const styles = {
     }
 }
 
-export default function Register() {
+export default function Register(props) {
 
     const [name, setName] = useState('')
     const [rules, setRules] = useState(false)
@@ -70,7 +70,8 @@ export default function Register() {
                         success: res.data.success,
                         won: res.data.won
                     }
-                    console.log(data.won)
+                    props.openAlert(true)
+                    props.setWon(data.won)
                     dispatch(reset())
                     navigate('/')
                 })

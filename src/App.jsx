@@ -3,27 +3,45 @@ import {Route, Routes} from "react-router-dom";
 import Code from "./components/Code.jsx";
 import Register from "./components/Register.jsx";
 import Guard from "./components/Guard.jsx";
+import WonAlert from "./components/WonAlert.jsx";
+import {useState} from "react";
 
 function App() {
 
-    return (
-        <Routes>
-            <Route
-                path="/"
-                element={
-                    <Code/>
-                }
-            />
+    const [openAlert, setOpenAlert] = useState(false)
+    const [won, setWon] = useState('')
 
-            <Route
-                path="/register"
-                element={
-                    <Guard>
-                        <Register/>
-                    </Guard>
-                }
+    return (
+        <>
+            <WonAlert
+                open={openAlert}
+                setOpen={setOpenAlert}
+                won={won}
             />
-        </Routes>
+            <Routes>
+                <Route
+                    path="/"
+                    element={
+                        <Code
+                            openAlert={setOpenAlert}
+                            setWon={setWon}
+                        />
+                    }
+                />
+
+                <Route
+                    path="/register"
+                    element={
+                        <Guard>
+                            <Register
+                                openAlert={setOpenAlert}
+                                setWon={setWon}
+                            />
+                        </Guard>
+                    }
+                />
+            </Routes>
+        </>
     )
 }
 

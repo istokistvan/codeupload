@@ -4,7 +4,7 @@ import datesBetween from "dates-between";
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 
-import {Box, Button, MenuItem, Paper, TextField, Typography} from "@mui/material";
+import {Box, Button, InputAdornment, MenuItem, Paper, TextField, Typography} from "@mui/material";
 
 import {useUploadMutation} from "../redux/api/rest.js";
 import {registration} from "../redux/slices/entrySlice.js";
@@ -34,12 +34,23 @@ const styles = {
     }
 }
 
+const formatText = (text) => {
+    return text.trim().toLowerCase()
+}
 
-export default function Code() {
+const formatDate = (date) => {
+    return date.toString().padStart(2, '0')
+}
+
+
+export default function Code(props) {
+
+    const current = `${formatDate(new Date().getMonth() + 1)}-${formatDate(new Date().getDate())}`
 
     const [email, setEmail] = useState('')
     const [code, setCode] = useState('')
-    const [day, setDay] = useState('')
+    const [codeLength, setCodeLength] = useState(0)
+    const [day, setDay] = useState(current)
     const [hour, setHour] = useState('')
     const [minute, setMinute] = useState('')
 
@@ -47,14 +58,6 @@ export default function Code() {
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
-
-    const formatText = (text) => {
-        return text.trim().toLowerCase()
-    }
-
-    const formatDate = (date) => {
-        return date.toString().padStart(2, '0')
-    }
 
     const handleEmailChange = useCallback((e) => {
         const res = formatText(e.target.value)
@@ -64,11 +67,14 @@ export default function Code() {
     const handleCodeChange = useCallback((e) => {
         const res = formatText(e.target.value)
         setCode(res)
+        setCodeLength(codeLength => codeLength)
     }, [code])
 
     const handleDayChange = useCallback((e) => {
+        setHour('')
+        setMinute('')
         setDay(e.target.value)
-    }, [day])
+    }, [day, hour, minute])
 
     const handleHourChange = useCallback((e) => {
         setHour(e.target.value)
@@ -81,10 +87,9 @@ export default function Code() {
     const calculateDates = () => {
         let res = []
 
-        const current = `2023.${new Date().getMonth() + 1}.${new Date().getDate()}`
-        const endDate = new Date(current) < new Date('2023.08.31') ? new Date(current) : new Date('2023.08.31')
+        const endDate = new Date(`2023-${current}`) < new Date('2023-08-31') ? new Date(`2023-${current}`) : new Date('2023-08-31')
 
-        for (const date of datesBetween(new Date('2023.06.01'), endDate)) {
+        for (const date of datesBetween(new Date('2023-06-01'), endDate)) {
             res = [
                 ...res,
                 {
@@ -97,42 +102,107 @@ export default function Code() {
         return (res)
     }
 
-    const renderDateSelect = useCallback(() => {
-        const dates = calculateDates()
+    const renderHourSelect = useCallback(() => {
 
-        if (dates) {
-            return (
+        const maxHours = current === day ? new Date().getHours() + 1 : 24
+        const maxMinutes = current === day ? new Date().getMinutes() + 1 : 60
+        return (
+            <>
                 <TextField
                     select
-                    label='Nap'
-                    name='day'
+                    label='Óra'
+                    name='hour'
                     variant='standard'
                     required
 
-                    value={day || dates[dates.length - 1].value}
-                    onChange={handleDayChange}
+                    value={hour}
+                    onChange={handleHourChange}
 
-                    sx={{flexGrow: 2}}
+                    sx={{flexGrow: 1}}
                 >
                     {
-                        dates.map((date) => {
+                        [...Array(maxHours).keys()].map((element) => {
                             return (
                                 <MenuItem
-                                    key={date.value}
-                                    value={date.value}
+                                    key={element}
+                                    value={element}
                                 >
-                                    {date.label}
+                                    {element.toString().padStart(2, '0')}
                                 </MenuItem>
                             )
                         })
                     }
                 </TextField>
+
+                <TextField
+                    select
+                    label='Perc'
+                    name='minute'
+                    variant='standard'
+                    required
+
+                    value={minute}
+                    onChange={handleMinuteChange}
+
+                    sx={{flexGrow: 1}}
+                >
+                    {
+                        [...Array(maxMinutes).keys()].map((element) => {
+                            return (
+                                <MenuItem
+                                    key={element}
+                                    value={element}
+                                >
+                                    {element.toString().padStart(2, '0')}
+                                </MenuItem>
+                            )
+                        })
+                    }
+                </TextField>
+            </>
+        )
+    }, [day, hour, minute])
+
+    const renderDateSelect = useCallback(() => {
+        const dates = calculateDates()
+
+        if (dates) {
+            return (
+                <>
+                    <TextField
+                        select
+                        label='Nap'
+                        name='day'
+                        variant='standard'
+                        required
+
+                        value={day || dates[dates.length - 1].value}
+                        onChange={handleDayChange}
+
+                        sx={{flexGrow: 2}}
+                    >
+                        {
+                            dates.map((date) => {
+                                return (
+                                    <MenuItem
+                                        key={date.value}
+                                        value={date.value}
+                                    >
+                                        {date.label}
+                                    </MenuItem>
+                                )
+                            })
+                        }
+                    </TextField>
+
+                    {renderHourSelect()}
+                </>
             )
         }
-    }, [day])
+    }, [day, hour, minute])
 
-    const handleSubmit = useCallback((event) => {
-        event.preventDefault()
+    const handleSubmit = useCallback((e) => {
+        e.preventDefault()
 
         const resDate = {
             day: formatDate(day),
@@ -140,7 +210,7 @@ export default function Code() {
             minute: formatDate(minute)
         }
 
-        if (code.length === 8) {
+        if (code.match('[A-Za-z0-9]{8}')) {
             upload({
                 email: email,
                 code: code,
@@ -153,11 +223,10 @@ export default function Code() {
                         success: res.data.success,
                         won: res.data.won
                     }
-                    console.log(data.won)
-
+                    props.openAlert(true)
+                    props.setWon(data.won)
                 })
                 .catch((err) => {
-                    console.log(err)
                     if (err.data.errors.length === 1 && err.data.errors[0].code === 'email:not_found') {
                         dispatch(registration({
                             email: email,
@@ -182,6 +251,7 @@ export default function Code() {
 
             onSubmit={handleSubmit}
         >
+
             <Typography
                 variant='h2'
             >
@@ -208,6 +278,12 @@ export default function Code() {
                 variant='standard'
                 required
 
+                InputProps={{
+                    endAdornment: <InputAdornment position='end'>{codeLength}</InputAdornment>,
+                }}
+
+                inputProps={{maxLength: 8}}
+
                 sx={{width: '75%'}}
 
                 value={code || ''}
@@ -217,60 +293,7 @@ export default function Code() {
             <Box
                 sx={styles.dateBox}
             >
-
                 {renderDateSelect()}
-
-                <TextField
-                    select
-                    label='Óra'
-                    name='hour'
-                    variant='standard'
-                    required
-
-                    value={hour}
-                    onChange={handleHourChange}
-
-                    sx={{flexGrow: 1}}
-                >
-                    {
-                        [...Array(24).keys()].map((element) => {
-                            return (
-                                <MenuItem
-                                    key={element}
-                                    value={element}
-                                >
-                                    {element.toString().padStart(2, '0')}
-                                </MenuItem>
-                            )
-                        })
-                    }
-                </TextField>
-
-                <TextField
-                    select
-                    label='Perc'
-                    name='minute'
-                    variant='standard'
-                    required
-
-                    value={minute}
-                    onChange={handleMinuteChange}
-
-                    sx={{flexGrow: 1}}
-                >
-                    {
-                        [...Array(60).keys()].map((element) => {
-                            return (
-                                <MenuItem
-                                    key={element}
-                                    value={element}
-                                >
-                                    {element.toString().padStart(2, '0')}
-                                </MenuItem>
-                            )
-                        })
-                    }
-                </TextField>
             </Box>
 
             <Button
