@@ -14,11 +14,13 @@ export const entrySlice = createSlice({
             state.email = action.payload.email
             state.code = action.payload.code
             state.purchase_time = action.payload.purchase_time
+            localStorage.setItem('user', JSON.stringify(state))
         },
         reset: (state) => {
             state.email = ''
             state.code = ''
             state.purchase_time = ''
+            localStorage.removeItem('user')
         }
     }
 })

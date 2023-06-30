@@ -1,7 +1,6 @@
 import {useCallback, useState} from "react";
 
-import {useDispatch, useSelector} from "react-redux";
-import {useNavigate} from "react-router-dom";
+import {useDispatch} from "react-redux";
 
 import {Button, Checkbox, FormControlLabel, Paper, TextField, Typography} from "@mui/material";
 
@@ -36,10 +35,9 @@ export default function Register(props) {
     const [register] = useRegisterMutation()
     const [upload] = useUploadMutation()
 
-    const userData = useSelector(state => state.entry)
+    const userData = JSON.parse(localStorage.getItem('user')) || ''
 
     const dispatch = useDispatch()
-    const navigate = useNavigate()
 
     const handleNameChange = useCallback((e) => {
         setName(e.target.value)
@@ -73,7 +71,6 @@ export default function Register(props) {
                     props.openAlert(true)
                     props.setWon(data.won)
                     dispatch(reset())
-                    navigate('/')
                 })
                 .catch((err) => console.log(err))
         }
@@ -92,43 +89,52 @@ export default function Register(props) {
                 Regisztráció
             </Typography>
 
-            <TextField
-                variant='standard'
-                type='email'
-                name='email'
-                disabled
-                value={userData.email}
-            />
-
-            <TextField
-                variant='standard'
-                type='text'
-                name='name'
-                label='Név'
-                required
-
-                value={name || ''}
-                onChange={handleNameChange}
-            />
-
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        name='rules'
-                        required
-                        checked={rules}
-                        onChange={handleRulesChange}
+            {userData ?
+                <>
+                    <TextField
+                        variant='standard'
+                        type='email'
+                        name='email'
+                        disabled
+                        value={userData.email || ''}
                     />
-                }
-                label='Elolvastam és elfogadom a játékszabályzatot.'/>
 
-            <Button
-                type='submit'
-                variant='contained'
-                color='success'
-            >
-                Regisztrálok
-            </Button>
+                    <TextField
+                        variant='standard'
+                        type='text'
+                        name='name'
+                        label='Név'
+                        required
+
+                        value={name || ''}
+                        onChange={handleNameChange}
+                    />
+
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                name='rules'
+                                required
+                                checked={rules}
+                                onChange={handleRulesChange}
+                            />
+                        }
+                        label='Elolvastam és elfogadom a játékszabályzatot.'
+                    />
+
+                    <Button
+                        type='submit'
+                        variant='contained'
+                        color='success'
+                    >
+                        Regisztrálok
+                    </Button>
+                </>
+                :
+                <Typography variant='h5'>
+                    Sikeres regisztráció! Térjen vissza a főoldalra!
+                </Typography>
+            }
         </Paper>
     )
 }
