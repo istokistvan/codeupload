@@ -53,6 +53,7 @@ export default function Code(props) {
     const [day, setDay] = useState(current)
     const [hour, setHour] = useState('')
     const [minute, setMinute] = useState('')
+    const [error, setError] = useState('')
 
     const [upload] = useUploadMutation()
 
@@ -67,8 +68,9 @@ export default function Code(props) {
     const handleCodeChange = useCallback((e) => {
         const res = formatText(e.target.value)
         setCode(res)
-        setCodeLength(codeLength => codeLength)
-    }, [code])
+        setError('')
+        setCodeLength(codeLength => e.target.value.length)
+    }, [code, error])
 
     const handleDayChange = useCallback((e) => {
         setHour('')
@@ -237,9 +239,9 @@ export default function Code(props) {
                     }
                 })
         } else {
-            console.log('Invalid code')
+            setError('A kód nem megfelelő!')
         }
-    }, [email, code, day, hour, minute, dispatch])
+    }, [email, code, day, hour, minute, dispatch, error])
 
 
     return (
@@ -277,6 +279,9 @@ export default function Code(props) {
                 name='code'
                 variant='standard'
                 required
+
+                error={!!error}
+                helperText={error}
 
                 InputProps={{
                     endAdornment: <InputAdornment position='end'>{codeLength}</InputAdornment>,

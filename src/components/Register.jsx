@@ -31,6 +31,7 @@ export default function Register(props) {
 
     const [name, setName] = useState('')
     const [rules, setRules] = useState(false)
+    const [error, setError] = useState('')
 
     const [register] = useRegisterMutation()
     const [upload] = useUploadMutation()
@@ -73,6 +74,8 @@ export default function Register(props) {
                     dispatch(reset())
                 })
                 .catch((err) => console.log(err))
+        } else {
+            setError('Adja meg a teljes nevét!')
         }
     }, [name, rules])
 
@@ -107,6 +110,10 @@ export default function Register(props) {
                         required
 
                         value={name || ''}
+
+                        error={!!error}
+                        helperText={error}
+
                         onChange={handleNameChange}
                     />
 
