@@ -41,6 +41,7 @@ export default function Register(props) {
     const dispatch = useDispatch()
 
     const handleNameChange = useCallback((e) => {
+        setError('')
         setName(e.target.value)
     }, [name])
 

@@ -104,10 +104,43 @@ export default function Code(props) {
         return (res)
     }
 
+    const renderMinuteSelect = useCallback(() => {
+
+        const maxMinutes = current === day && hour === new Date().getHours() ? new Date().getMinutes() + 1 : 60
+
+        return (
+            <TextField
+                select
+                label='Perc'
+                name='minute'
+                variant='standard'
+                required
+
+                value={minute}
+                onChange={handleMinuteChange}
+
+                sx={{flexGrow: 1}}
+            >
+                {
+                    [...Array(maxMinutes).keys()].map((element) => {
+                        return (
+                            <MenuItem
+                                key={element}
+                                value={element}
+                            >
+                                {element.toString().padStart(2, '0')}
+                            </MenuItem>
+                        )
+                    })
+                }
+            </TextField>
+        )
+    }, [day, hour, minute])
+
     const renderHourSelect = useCallback(() => {
 
         const maxHours = current === day ? new Date().getHours() + 1 : 24
-        const maxMinutes = current === day ? new Date().getMinutes() + 1 : 60
+
         return (
             <>
                 <TextField
@@ -135,32 +168,7 @@ export default function Code(props) {
                         })
                     }
                 </TextField>
-
-                <TextField
-                    select
-                    label='Perc'
-                    name='minute'
-                    variant='standard'
-                    required
-
-                    value={minute}
-                    onChange={handleMinuteChange}
-
-                    sx={{flexGrow: 1}}
-                >
-                    {
-                        [...Array(maxMinutes).keys()].map((element) => {
-                            return (
-                                <MenuItem
-                                    key={element}
-                                    value={element}
-                                >
-                                    {element.toString().padStart(2, '0')}
-                                </MenuItem>
-                            )
-                        })
-                    }
-                </TextField>
+                {renderMinuteSelect()}
             </>
         )
     }, [day, hour, minute])
@@ -235,7 +243,7 @@ export default function Code(props) {
                             code: code,
                             purchase_time: `2023-${resDate.day} ${resDate.hour}:${resDate.minute}`
                         }))
-                        window.open('/register', '_blank')
+                        window.open('/register')
                     }
                 })
         } else {
