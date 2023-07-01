@@ -1,3 +1,5 @@
+A legfrissebb verzió kipróbálható: [https://istokistvan.github.io/codeupload/]
+
 # CodeUpload
 Egy cég fogyasztásösztönző promóciót
 szeretne futtatni. Ennek a lényege, hogy akik vásárolnak a termékeikből, azok
