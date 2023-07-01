@@ -11,7 +11,7 @@ import store from "./redux/store";
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <HashRouter
-            basename={import.meta.env.DEV ? '/' : '/codeupload/'}
+            basename='/'
         >
             <Provider store={store}>
                 <App/>
