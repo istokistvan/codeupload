@@ -243,7 +243,7 @@ export default function Code(props) {
                             code: code,
                             purchase_time: `2023-${resDate.day} ${resDate.hour}:${resDate.minute}`
                         }))
-                        window.open(`/register`)
+                        window.open(`${window.location.origin}/#/register`)
                     }
                 })
         } else {
