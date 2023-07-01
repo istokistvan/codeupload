@@ -1,7 +1,6 @@
 import {useCallback, useState} from "react";
 
 import datesBetween from "dates-between";
-import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 
 import {Box, Button, InputAdornment, MenuItem, Paper, TextField, Typography} from "@mui/material";
@@ -57,7 +56,6 @@ export default function Code(props) {
 
     const [upload] = useUploadMutation()
 
-    const navigate = useNavigate()
     const dispatch = useDispatch()
 
     const handleEmailChange = useCallback((e) => {
@@ -243,7 +241,6 @@ export default function Code(props) {
                             code: code,
                             purchase_time: `2023-${resDate.day} ${resDate.hour}:${resDate.minute}`
                         }))
-                        console.log(`${window.location.href}/#/register`)
                         window.open(`${window.location.href}/#/register`)
                     }
                 })

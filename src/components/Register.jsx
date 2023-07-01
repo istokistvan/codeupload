@@ -74,7 +74,7 @@ export default function Register(props) {
                     props.setWon(data.won)
                     dispatch(reset())
                 })
-                .catch((err) => console.log(err))
+                .catch((err) => console.log("Hibás adatok!"))
         } else {
             setError('Adja meg a teljes nevét!')
         }
