@@ -37,7 +37,6 @@ export default function Register(props) {
     const [upload] = useUploadMutation()
 
     const userData = JSON.parse(localStorage.getItem('user')) || ''
-    console.log(userData)
 
     const dispatch = useDispatch()
 
